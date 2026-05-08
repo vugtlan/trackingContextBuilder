@@ -49,9 +49,10 @@ and a.createdatetime >= {startdate}) a
 
 ,reference_data as 
 (
-select rdw.*, lb.carrier_code
+select rdw.*, lb.carrier_code, p.name carrier_name
 from reference_data_working rdw
 inner join nast_carrier_domain.broker.load_books lb on lb.load_num = rdw.loadnumber and bounced = False and nast_truckload_flag = True
+left join cdc_mdm.broker.mdm_party p on p.partycode = lb.carrier_code
 qualify count(distinct carrier_code) over (partition by loadnumber) = 1
 )
 
