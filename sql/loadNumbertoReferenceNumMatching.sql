@@ -1,4 +1,4 @@
-with reference_data as
+with reference_data_working as
 (SELECT
 A.LOADNUMBER
 ,MDM.PARTYCODE::string partycode
@@ -45,6 +45,14 @@ INNER JOIN CDC_MDM.BROKER.MDM_PARTY AS MDM ON MDM.PARTYNUMBER = OP.PARTYNUMBER A
 INNER JOIN CDC_ORION.BROKER.REFERENCE_ENTITY AS RE ON RE.ENTITYID = RN.ENTITYID AND RE.HVR_ISDELETE = 0
 WHERE A.HVR_ISDELETE = 0
 and a.createdatetime >= {startdate}) a
+)
+
+,reference_data as 
+(
+select rdw.*, lb.carrier_code
+from reference_data_working rdw
+inner join nast_carrier_domain.broker.load_books lb on lb.load_num = rdw.loadnumber and bounced = False and nast_truckload_flag = True
+qualify count(distinct carrier_code) over (partition by loadnumber) = 1
 )
 
 select * from reference_data where loadnumber is not null
