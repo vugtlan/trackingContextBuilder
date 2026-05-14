@@ -101,6 +101,7 @@ wd.workdays
 from cleaned_emails a
 left join nast_truckload_domain.broker.dim_date d on d.date = cast(a.time_sent_utc as date)
 left join workdays_month wd on wd.monthstartdate = d.monthstartdate
+where a.sender_is_chr = 1 -- include this if you only want to look at emails sent by CHR employees
 )
 
 select * from final_emails

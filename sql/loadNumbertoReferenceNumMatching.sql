@@ -53,6 +53,7 @@ select rdw.*, lb.carrier_code, p.name carrier_name
 from reference_data_working rdw
 inner join nast_carrier_domain.broker.load_books lb on lb.load_num = rdw.loadnumber and bounced = False and nast_truckload_flag = True
 left join cdc_mdm.broker.mdm_party p on p.partycode = lb.carrier_code
+inner join cdc_mdm.broker.mdm_partytype pt on pt.partytypeid = p.partytypeid and pt.description = 'Carriers' -- filtering to just party types of carriers (in case any non carriers are listed as carriers)
 qualify count(distinct carrier_code) over (partition by loadnumber) = 1
 )
 
